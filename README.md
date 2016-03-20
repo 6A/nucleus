@@ -76,3 +76,6 @@ using (DynamicDictionaryQuery dic = connection.DictionaryQuery("time"))
 ```
 
 You have a query opened from two places at the same time? No problem, queries are sync everywhere. See [Tests](Nucleus.Tests) for more information.
+
+## Informations
+- Data is saved to file everytime `BaseQuery.Save()` is called. By default, this method is called when `Disposed()` is called. This behaviour can be changed by passing `false` to `Connection.*Query(string, bool)` or by changing `BaseQuery.SaveOnDisposed` to `false`.
