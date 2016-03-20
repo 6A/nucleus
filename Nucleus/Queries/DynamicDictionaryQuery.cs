@@ -10,14 +10,27 @@ namespace Nucleus
 {
     public class DynamicDictionaryKeyValuePair
     {
+        private object value;
+        private Func<object> loader;
+
         public Type ValueType { get; private set; }
-        public object Value { get; private set; }
         public string Key { get; private set; }
 
-        internal DynamicDictionaryKeyValuePair(object v, string k)
+        public object Value
         {
-            ValueType = v?.GetType();
-            Value = v;
+            get
+            {
+                if (value == null)
+                    value = loader();
+
+                return value;
+            }
+        }
+
+        internal DynamicDictionaryKeyValuePair(Type t, Func<object> f, string k)
+        {
+            loader = f;
+            ValueType = t;
             Key = k;
         }
 
@@ -162,15 +175,18 @@ namespace Nucleus
             int i = 0;
             foreach (var kvp in s.Values.Skip(2))
             {
-                object o;
-                if (TryGet(keys[i], types[i], out o))
+                yield return new DynamicDictionaryKeyValuePair(types[i], () =>
                 {
-                    yield return new DynamicDictionaryKeyValuePair(o, keys[i++]);
-                }
-                else
-                {
-                    throw new Exception();
-                }
+                    object o;
+                    if (TryGet(keys[i], types[i], out o))
+                    {
+                        return o;
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }, keys[i]);
             }
         }
 
