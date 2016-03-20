@@ -48,7 +48,7 @@ using (Query<DateTime> dic = connection.Query<DateTime>("time"))
 ```csharp
 using (DictionaryQuery<DateTime> dic = connection.DictionaryQuery<DateTime>("time"))
 {
-    // DictionaryQuery<T> fully implements IDictionary<T>
+    // DictionaryQuery<T> fully implements IDictionary<string, T>
 }
 ```
 
@@ -56,7 +56,7 @@ using (DictionaryQuery<DateTime> dic = connection.DictionaryQuery<DateTime>("tim
 ```csharp
 using (DynamicDictionaryQuery dic = connection.DictionaryQuery("time"))
 {
-    // DynamicDictionaryQuery fully implements IEnumerable
+    // DynamicDictionaryQuery fully implements IEnumerable<DynamicDictionaryKeyValuePair>
     dic.Set<string>("hello", "world");
     dic.Set<DateTime>("hello", DateTime.Now);
     
@@ -75,4 +75,4 @@ using (DynamicDictionaryQuery dic = connection.DictionaryQuery("time"))
 }
 ```
 
-You have a query opened from two places at the same time? No problem, queries are sync everywhere.
+You have a query opened from two places at the same time? No problem, queries are sync everywhere. See [Tests](Nucleus.Tests) for more information.
