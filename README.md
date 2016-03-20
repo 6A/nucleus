@@ -79,3 +79,18 @@ You have a query opened from two places at the same time? No problem, queries ar
 
 ## Informations
 - Data is saved to file everytime `BaseQuery.Save()` is called. By default, this method is called when `Disposed()` is called. This behaviour can be changed by passing `false` to `Connection.*Query(string, bool)` or by changing `BaseQuery.SaveOnDisposed` to `false`.
+
+## How does it work?
+What follows is technical. You do not need to know how Nucleus works to use it.
+
+The file is cut into small pieces named "Sectors." For each sector, there is a Query. Sectors are recognized based on their **name** and their **type**.  
+Basically, a sector starts with four bytes that can be converted into an `int`. This `int` is the length of the sector. Once the length is parsed, the given length is read to bytes and given to a new `Sector`, that will parse the metadata, which is:
+- first byte: [SectorType](Nucleus/Sectors/Sector.cs#L10)
+- second to fifth byte: length of internal metadata
+- all that follows: internal metadata and data
+
+Once the Sector knows the length of the metadata, it will decode it to an UTF8 string, and read it as follows:
+- the first characters, up to the first semicolon, are the name of the sector
+- the characters that follow are split into pairs like this: `string.Split(';').Select(x => x.Split(':'))`. First character of the pair is the index of the value (it is essential to know it internally, but the order has no meaning), and the second is the length of the value
+
+At this point, the Sector is fully parsed. Editing a sector is editing the metadata, and writing bytes to what follows.
