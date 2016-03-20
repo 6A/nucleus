@@ -44,17 +44,32 @@ namespace Nucleus
 
         public Query<T> Query<T>(string name)
         {
-            return new Query<T>(Enumerator.OfNameAndType(name, SectorType.Generic));
+            return Query<T>(name, true);
         }
 
         public DynamicDictionaryQuery DictionaryQuery(string name)
         {
-            return new DynamicDictionaryQuery(Enumerator.OfNameAndType(name, SectorType.Generic));
+            return DictionaryQuery(name, true);
         }
 
         public DictionaryQuery<T> DictionaryQuery<T>(string name)
         {
-            return new DictionaryQuery<T>(Enumerator.OfNameAndType(name, SectorType.Generic | SectorType.Dictionary));
+            return DictionaryQuery<T>(name, true);
+        }
+
+        public Query<T> Query<T>(string name, bool saveOnDisposed)
+        {
+            return new Query<T>(Enumerator.OfNameAndType(name, SectorType.Generic), saveOnDisposed);
+        }
+
+        public DynamicDictionaryQuery DictionaryQuery(string name, bool saveOnDisposed)
+        {
+            return new DynamicDictionaryQuery(Enumerator.OfNameAndType(name, SectorType.Generic), saveOnDisposed);
+        }
+
+        public DictionaryQuery<T> DictionaryQuery<T>(string name, bool saveOnDisposed)
+        {
+            return new DictionaryQuery<T>(Enumerator.OfNameAndType(name, SectorType.Generic | SectorType.Dictionary), saveOnDisposed);
         }
 
         public void Dispose()

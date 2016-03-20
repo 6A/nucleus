@@ -12,7 +12,7 @@ namespace Nucleus
     {
         private List<string> keys;
 
-        internal DictionaryQuery(Sector sector) : base(sector)
+        internal DictionaryQuery(Sector sector, bool saveOnDisposed) : base(sector, saveOnDisposed)
         {
             byte[] bytes;
             if (this.TryRead(0, out bytes))

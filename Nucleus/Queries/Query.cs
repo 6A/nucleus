@@ -13,7 +13,7 @@ namespace Nucleus
         public int Count { get { return s.Values.Length; } }
         public bool IsReadOnly { get { return false; } }
 
-        internal Query(Sector sector) : base(sector) { }
+        internal Query(Sector sector, bool saveOnDisposed) : base(sector, saveOnDisposed) { }
 
         public T this[int index]
         {

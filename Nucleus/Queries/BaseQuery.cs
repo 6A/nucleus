@@ -18,11 +18,14 @@ namespace Nucleus
         private MemoryStream io { get { return s.Stream; } }
         bool changed;
 
-        internal BaseQuery(Sector sector)
+        public bool SaveOnDisposed { get; set; }
+
+        internal BaseQuery(Sector sector, bool saveOnDisposed)
         {
             s = sector;
             cache = new Dictionary<int, T>();
             changed = false;
+            SaveOnDisposed = saveOnDisposed;
 
             s.Updated += SectorUpdated;
         }
@@ -213,7 +216,8 @@ namespace Nucleus
 
         public void Dispose()
         {
-            this.Save();
+            if (this.SaveOnDisposed)
+                this.Save();
         }
     }
 }

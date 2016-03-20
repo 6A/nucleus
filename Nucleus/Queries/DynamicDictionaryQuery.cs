@@ -45,7 +45,7 @@ namespace Nucleus
         private List<string> keys;
         private List<Type> types;
 
-        internal DynamicDictionaryQuery(Sector sector) : base(sector)
+        internal DynamicDictionaryQuery(Sector sector, bool saveOnDisposed) : base(sector, saveOnDisposed)
         {
             byte[] keysBytes;
             byte[] typesBytes;
