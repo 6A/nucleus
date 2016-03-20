@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus", "Nucleus\Nucleus.csproj", "{44FC1D35-503F-4902-8226-8C370C771033}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Tests", "Nucleus.Tests\Nucleus.Tests.csproj", "{0E22B4FA-F414-449C-8053-F12644EA09E8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{44FC1D35-503F-4902-8226-8C370C771033}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44FC1D35-503F-4902-8226-8C370C771033}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44FC1D35-503F-4902-8226-8C370C771033}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44FC1D35-503F-4902-8226-8C370C771033}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E22B4FA-F414-449C-8053-F12644EA09E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E22B4FA-F414-449C-8053-F12644EA09E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E22B4FA-F414-449C-8053-F12644EA09E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E22B4FA-F414-449C-8053-F12644EA09E8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
