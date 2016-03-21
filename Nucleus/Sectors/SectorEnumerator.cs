@@ -66,6 +66,12 @@ namespace Nucleus
         public Sector OfNameAndType(string name, SectorType type)
         {
             name = name.ToLower();
+
+            if (name.ToCharArray().Contains(';'))
+            {
+                throw new FormatException("Illegal character in sector name: ';'");
+            }
+
             Sector sector = cache.FirstOrDefault(x => x.Name == name);
 
             if (sector != null)

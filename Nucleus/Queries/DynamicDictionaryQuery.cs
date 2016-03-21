@@ -161,13 +161,21 @@ namespace Nucleus
 
             if (index > 0)
             {
-                TryRemove(index);
+                if (TryRemove(index))
+                {
+                    types.RemoveAt(index);
+                    keys.RemoveAt(index);
+                }
             }
         }
 
         public void Clear()
         {
-            TryClear();
+            if (TryClear())
+            {
+                types.Clear();
+                keys.Clear();
+            }
         }
 
         public IEnumerator<DynamicDictionaryKeyValuePair> GetEnumerator()

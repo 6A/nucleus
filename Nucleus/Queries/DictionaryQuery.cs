@@ -95,7 +95,16 @@ namespace Nucleus
         public bool Remove(string key)
         {
             int index = keys.IndexOf(key);
-            return index != -1 ? TryRemove(index + 1) : false;
+
+            if (index >= 0 && TryRemove(index + 1))
+            {
+                keys.RemoveAt(index);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public bool TryGetValue(string key, out T value)
@@ -130,7 +139,10 @@ namespace Nucleus
 
         public void Clear()
         {
-            TryClear();
+            if (TryClear())
+            {
+                keys.Clear();
+            }
         }
 
         public bool Contains(KeyValuePair<string, T> item)
@@ -148,8 +160,7 @@ namespace Nucleus
 
         public bool Remove(KeyValuePair<string, T> item)
         {
-            int index = keys.IndexOf(item.Key);
-            return index != -1 ? TryRemove(index + 1) : false;
+            return Remove(item.Key);
         }
 
         public IEnumerator<KeyValuePair<string, T>> GetEnumerator()
