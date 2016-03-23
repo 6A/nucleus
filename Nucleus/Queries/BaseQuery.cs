@@ -40,6 +40,7 @@ namespace Nucleus
             if (changed)
             {
                 s.Update();
+                changed = false;
             }
         }
 
@@ -200,7 +201,7 @@ namespace Nucleus
                 cache.Add(index, s.enumerator.core.Deserialize<T>(bytes));
             return cache[index];
         }
-
+        
         protected object Deserialize(int index, byte[] bytes, Type t)
         {
             return s.enumerator.core.GetType().GetRuntimeMethods()

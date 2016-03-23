@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -78,7 +80,7 @@ namespace Nucleus
             return -1;
         }
 
-        private bool TryGet(string key, Type t, out object o)
+        internal bool TryGet(string key, Type t, out object o)
         {
             o = null;
             int i = IndexOf(key, t);

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Raven.Imports.Newtonsoft.Json;
 
 namespace Nucleus.Tests
 {
@@ -13,18 +14,7 @@ namespace Nucleus.Tests
 
         protected override T Deserialize<T>(byte[] bytes)
         {
-            if (typeof(T) == typeof(String))
-            {
-                return (T)(object)Encoding.UTF8.GetString(bytes);
-            }
-            else if (typeof(T) == typeof(DateTime))
-            {
-                return (T)(object)DateTime.FromBinary(BitConverter.ToInt64(bytes, 0));
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
+            return JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bytes));
         }
 
         protected override Stream GetRWStream()
@@ -34,7 +24,7 @@ namespace Nucleus.Tests
 
         protected override byte[] Serialize<T>(T obj)
         {
-            return obj is DateTime ? BitConverter.GetBytes(((DateTime)(object)obj).ToBinary()) : Encoding.UTF8.GetBytes(obj.ToString());
+            return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj));
         }
 
         public Connection(string url)

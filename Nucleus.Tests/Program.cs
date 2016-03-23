@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace Nucleus.Tests
 {
-    class Program
+    partial class Program
     {
         static Connection cx;
         static string file;
@@ -37,6 +37,7 @@ namespace Nucleus.Tests
                 TestParallelModifications();
             }
 
+            Benchmark();
             Console.ReadKey();
         }
 

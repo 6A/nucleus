@@ -18,7 +18,7 @@ namespace Nucleus
 
     internal class Sector : IDisposable
     {
-        private const int BLOCK_SIZE = 4096 * 2;
+        private const int BLOCK_SIZE = 1024 * 128;
         private bool isNew = false;
 
         /// <summary>
@@ -135,13 +135,15 @@ namespace Nucleus
                 byte[] bytes = new byte[BLOCK_SIZE];
                 int read = 0;
                 long left = enumerator.io.Length - Offset - Length;
+                long total = 0;
 
                 enumerator.io.Seek(End, SeekOrigin.Begin);
                 do
                 {
-                    read = enumerator.io.Read(bytes, 0, bytes.Length);
-                    enumerator.io.Seek(-(Length + 4 + read), SeekOrigin.Current);
+                    read = enumerator.io.Read(bytes, 0, BLOCK_SIZE > (int)left ? (int)left : BLOCK_SIZE);
+                    enumerator.io.Seek(Start + total, SeekOrigin.Begin);
                     enumerator.io.Write(bytes, 0, read);
+                    total += read;
                 }
                 while ((left -= read) > 0);
             }
