@@ -20,6 +20,7 @@ namespace Nucleus.Tests
         static void Main(string[] args)
         {
             file = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"nucleus.db");
+            if (File.Exists(file)) File.Delete(file); // temporary
             isNew = !File.Exists(file);
 
             using (cx = new Connection(file))
@@ -62,6 +63,14 @@ namespace Nucleus.Tests
                     () => dic.ShouldContainKey("Name"),
                     () => dic["Name"].ShouldBe(Assembly.GetExecutingAssembly().FullName)
                 );
+
+                dynamic dyn = dic.AsDynamic();
+                (dyn.Name as object).ShouldBe(dic["Name"]);
+
+                dyn.Name = Assembly.GetExecutingAssembly().GetName().Name;
+                dic["Name"].ShouldBe(Assembly.GetExecutingAssembly().GetName().Name);
+
+                dic["Name"] = Assembly.GetExecutingAssembly().FullName;
             }
         }
 

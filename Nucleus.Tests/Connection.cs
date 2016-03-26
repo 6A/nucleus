@@ -14,7 +14,9 @@ namespace Nucleus.Tests
 
         protected override T Deserialize<T>(byte[] bytes)
         {
-            return JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bytes));
+            return typeof(T) == typeof(string)
+                ? (T)(object)Encoding.UTF8.GetString(bytes)
+                : JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bytes));
         }
 
         protected override Stream GetRWStream()
@@ -24,7 +26,9 @@ namespace Nucleus.Tests
 
         protected override byte[] Serialize<T>(T obj)
         {
-            return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj));
+            return typeof(T) == typeof(string)
+                ? Encoding.UTF8.GetBytes((string)(object)obj)
+                : Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj));
         }
 
         public Connection(string url)

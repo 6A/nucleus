@@ -31,6 +31,9 @@ namespace Nucleus
 
         public void UpdateSector(Sector s, long offset, int length)
         {
+            cache.Remove(s);
+            cache.Add(s);
+
             if (SectorMoved != null)
             {
                 SectorMoved(s, offset, length);
@@ -39,6 +42,9 @@ namespace Nucleus
 
         public void UpdateSector(Sector s, object o)
         {
+            cache.Remove(s);
+            cache.Add(s);
+
             if (SectorChanged != null)
             {
                 SectorChanged(s, o);
@@ -72,7 +78,7 @@ namespace Nucleus
                 throw new FormatException("Illegal character in sector name: ';'");
             }
 
-            Sector sector = cache.FirstOrDefault(x => x.Name == name);
+            Sector sector = cache.FirstOrDefault(x => x.Name == name && x.Type == type);
 
             if (sector != null)
             {
@@ -84,6 +90,21 @@ namespace Nucleus
                 cache.Add(sector);
                 return sector;
             }
+        }
+
+        public MemoryStream RequestMemoryStream(Sector s)
+        {
+            MemoryStream ms = new MemoryStream();
+            var metadata = s.Metadata;
+            byte[] bytes = new byte[s.Length == 0 ? 0 : s.Length - metadata.Length];
+
+            io.Seek((int)s.Offset + metadata.Length, SeekOrigin.Begin);
+            io.Read(bytes, 0, bytes.Length);
+            ms.Write(bytes, 0, bytes.Length);
+
+            bytes = null;
+            metadata = null;
+            return ms;
         }
 
         private IEnumerable<Sector> Read()
@@ -111,6 +132,19 @@ namespace Nucleus
         {
             cache.Clear();
             io.Dispose();
+        }
+
+        public override string ToString()
+        {
+            long originalPos = io.Position;
+            io.Seek(0, SeekOrigin.Begin);
+            StringBuilder sb = new StringBuilder();
+            int read;
+            byte[] bytes = new byte[4096];
+            while ((read = io.Read(bytes, 0, 4096)) > 0)
+                sb.Append(Encoding.UTF8.GetString(bytes, 0, read));
+            io.Seek(originalPos, SeekOrigin.Begin);
+            return sb.ToString();
         }
     }
 }

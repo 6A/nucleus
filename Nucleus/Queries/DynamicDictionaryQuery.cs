@@ -196,7 +196,7 @@ namespace Nucleus
                     {
                         throw new Exception();
                     }
-                }, keys[i]);
+                }, keys[i++]);
             }
         }
 

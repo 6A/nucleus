@@ -28,6 +28,12 @@ namespace Nucleus
             SaveOnDisposed = saveOnDisposed;
 
             s.Updated += SectorUpdated;
+            s.Connected++;
+        }
+
+        public override string ToString()
+        {
+            return io == null ? "Disposed." : Encoding.UTF8.GetString(io.ToArray(), 0, (int)io.Length);
         }
 
         private void SectorUpdated(object obj)
@@ -219,6 +225,9 @@ namespace Nucleus
         {
             if (this.SaveOnDisposed)
                 this.Save();
+
+            cache = null;
+            s.Connected--;
         }
     }
 }

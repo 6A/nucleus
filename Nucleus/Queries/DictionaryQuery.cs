@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -111,19 +112,8 @@ namespace Nucleus
         {
             if (keys.Contains(key))
             {
-                int index = keys.IndexOf(key);
-                byte[] bytes;
-
-                if (this.TryRead(index, out bytes))
-                {
-                    value = this.Deserialize(index, bytes);
-                    return true;
-                }
-                else
-                {
-                    value = default(T);
-                    return false;
-                }
+                value = this[key];
+                return true;
             }
             else
             {
@@ -175,5 +165,106 @@ namespace Nucleus
         {
             return GetEnumerator();
         }
+
+        #region Dynamic
+        public dynamic AsDynamic()
+        {
+            return new DynamicQuery<T>(this);
+        }
+
+        public class DynamicQuery<T> : DynamicObject, IDisposable
+        {
+            private DictionaryQuery<T> query;
+
+            public DynamicQuery(DictionaryQuery<T> dic)
+            {
+                query = dic;
+            }
+
+            public override IEnumerable<string> GetDynamicMemberNames()
+            {
+                return query.keys;
+            }
+
+            private string keyIn(object[] indexes)
+            {
+                return indexes.Length == 1 && indexes[0] is string ? (string)indexes[0] : null;
+            }
+
+            public override bool TryDeleteIndex(DeleteIndexBinder binder, object[] indexes)
+            {
+                string s = keyIn(indexes);
+                return (s == null) ? false : query.Remove(s);
+            }
+
+            public override bool TryDeleteMember(DeleteMemberBinder binder)
+            {
+                return query.Remove(binder.Name);
+            }
+
+            public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
+            {
+                string s = keyIn(indexes);
+
+                if (s != null && query.keys.Contains(s))
+                {
+                    result = query[s];
+                    return true;
+                }
+                else
+                {
+                    result = null;
+                    return false;
+                }
+            }
+
+            public override bool TryGetMember(GetMemberBinder binder, out object result)
+            {
+                if (query.keys.Contains(binder.Name))
+                {
+                    result = query[binder.Name];
+                    return true;
+                }
+                else
+                {
+                    result = null;
+                    return false;
+                }
+            }
+
+            public override bool TrySetIndex(SetIndexBinder binder, object[] indexes, object value)
+            {
+                string s = keyIn(indexes);
+
+                if (s != null && value is T)
+                {
+                    query[s] = (T)value;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            public override bool TrySetMember(SetMemberBinder binder, object value)
+            {
+                if (value is T)
+                {
+                    query[binder.Name] = (T)value;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            public void Dispose()
+            {
+                query.Dispose();
+            }
+        }
+        #endregion
     }
 }

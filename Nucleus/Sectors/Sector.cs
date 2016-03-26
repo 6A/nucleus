@@ -41,15 +41,20 @@ namespace Nucleus
         /// </summary>
         public long End { get { return Offset + Length; } }
 
+        private volatile int connectedQueries = 0;
+        internal int Connected { get { return connectedQueries; } set { connectedQueries = value; if (connectedQueries == 0 && ms != null) { ms.Dispose(); ms = null; } } }
+
+        private MemoryStream ms = null;
+        public MemoryStream Stream { get { if (ms == null) ms = enumerator.RequestMemoryStream(this); return ms; } }
+
         public SectorType Type { get; private set; }
         public OrderedDictionary Values { get; private set; }
-        public MemoryStream Stream { get; private set; }
         public string Name { get; private set; }
         public SectorEnumerator enumerator { get; set; }
 
         public event Action<object> Updated;
 
-        protected byte[] Metadata
+        protected internal byte[] Metadata
         {
             get
             {
@@ -69,7 +74,6 @@ namespace Nucleus
             Name = name;
             Type = type;
             Values = new OrderedDictionary();
-            Stream = new MemoryStream(0);
             enumerator = se;
             
             Length = 0;
@@ -93,8 +97,6 @@ namespace Nucleus
             metadata = metadata.Substring(Name.Length + 1);
 
             Values = new OrderedDictionary(metadata);
-            Stream = new MemoryStream(0);
-            Stream.Write(bytes, 5 + metadatalength, bytes.Length - 5 - metadatalength);
             se.SectorMoved += UpdateSectorWhenMovement;
             se.SectorChanged += UpdateSectorWhenChange;
         }
@@ -104,11 +106,18 @@ namespace Nucleus
             return obj is Sector && (obj as Sector).Type == this.Type && (obj as Sector).Name == this.Name;
         }
 
+        public override int GetHashCode()
+        {
+            int i = 0;
+            foreach (char c in Name.ToCharArray()) i *= (int)c / 10;
+            return i * (int)Type;
+        }
+
         private void UpdateSectorWhenMovement(Sector obj, long offset, int length)
         {
             if (obj != this && offset < this.Offset)
             {
-                this.Offset -= length;
+                this.Offset -= length + offset - 4;
             }
         }
 
@@ -116,8 +125,9 @@ namespace Nucleus
         {
             if (obj.Equals(this))
             {
-                this.Stream = obj.Stream;
+                this.ms = obj.Stream;
                 this.Values = obj.Values;
+                this.connectedQueries = obj.connectedQueries;
 
                 if (Updated != null)
                 {
@@ -129,8 +139,14 @@ namespace Nucleus
         public void Update()
         {
             int newLength = (int)Stream.Length;
+            long oldOffset = Offset;
+            byte[] metadata = Metadata;
 
-            if (!isNew) // overwrite old sector with what follows
+            if (isNew)
+            {
+                enumerator.io.Seek(0, SeekOrigin.End);
+            }
+            else if (newLength + metadata.Length != Length) // overwrite old sector with what follows
             {
                 byte[] bytes = new byte[BLOCK_SIZE];
                 int read = 0;
@@ -146,6 +162,12 @@ namespace Nucleus
                     total += read;
                 }
                 while ((left -= read) > 0);
+
+                enumerator.UpdateSector(this, oldOffset, Length);
+            }
+            else
+            {
+                enumerator.io.Seek(Start, SeekOrigin.Begin);
             }
 
             if (newLength == 0) // delete sector
@@ -161,13 +183,13 @@ namespace Nucleus
                         enumerator.io.SetLength(enumerator.io.Length - Length - 4);
                     }
 
+                    isNew = true;
                     return;
                 }
             }
             else // write sector to end
             {
                 // append sector metadata
-                byte[] metadata = Metadata;
                 enumerator.io.Write(BitConverter.GetBytes(newLength + metadata.Length), 0, 4);
                 enumerator.io.Write(metadata, 0, metadata.Length);
 
@@ -176,13 +198,13 @@ namespace Nucleus
 
                 if (newLength + metadata.Length < Length) // resize if necessary
                 {
-                    enumerator.io.SetLength(enumerator.io.Length - Length + newLength + metadata.Length - 4);
+                    enumerator.io.SetLength(enumerator.io.Length - Length + newLength + metadata.Length);
                 }
                 
                 Length = newLength + metadata.Length;
-                this.Offset = enumerator.io.Length - Length;
+                Offset = enumerator.io.Length - Length;
+                isNew = false;
             }
-            enumerator.UpdateSector(this, this.Offset, Length + 4);
         }
 
         #region IDisposable Support

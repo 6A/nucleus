@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Raven.Server;
 using Raven.Client;
 using Raven.Client.Embedded;
+using System.IO;
 
 namespace Nucleus.Tests
 {
@@ -29,7 +30,7 @@ namespace Nucleus.Tests
 
             public static IDocumentStore Initialize()
             {
-                instance = new EmbeddableDocumentStore { DataDirectory = @"D:\Raven", UseEmbeddedHttpServer = true };
+                instance = new EmbeddableDocumentStore { DataDirectory = @"D:\Raven" };
                 instance.Conventions.IdentityPartsSeparator = "-";
                 instance.Initialize();
                 return instance;
@@ -87,11 +88,13 @@ namespace Nucleus.Tests
             sw.Restart();
             List<User> nusers = nquery.Take(256).ToList();
             nquery.Dispose();
+            nucleus.Dispose();
             sw.Stop();
             nucleusRead = sw.ElapsedMilliseconds;
 
             sw.Restart();
             List<User> rusers = rquery.Query<User>().Take(256).ToList();
+            rquery.Dispose();
             DataDocumentStore.Instance.Dispose();
             sw.Stop();
             ravendbRead = sw.ElapsedMilliseconds;
@@ -105,6 +108,16 @@ namespace Nucleus.Tests
 
             rusers.Clear();
             nusers.Clear();
+
+            using (FileStream fs = new FileStream(@"D:\nucleus.db", FileMode.Open, FileAccess.Read))
+            {
+                Console.WriteLine("Nucleus' file weights {0} KBs.", Math.Round((double)(fs.Length / 1024), 2));
+            }
+
+            using (FileStream fs = new FileStream(@"D:\Raven\DATA", FileMode.Open, FileAccess.Read))
+            {
+                Console.WriteLine("RavenDB' file weights {0} KBs.", Math.Round((double)(fs.Length / 1024), 2));
+            }
         }
     }
 }

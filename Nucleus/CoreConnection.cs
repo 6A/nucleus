@@ -64,7 +64,7 @@ namespace Nucleus
 
         public DynamicDictionaryQuery DictionaryQuery(string name, bool saveOnDisposed)
         {
-            return new DynamicDictionaryQuery(Enumerator.OfNameAndType(name, SectorType.Generic), saveOnDisposed);
+            return new DynamicDictionaryQuery(Enumerator.OfNameAndType(name, SectorType.Dictionary), saveOnDisposed);
         }
 
         public DictionaryQuery<T> DictionaryQuery<T>(string name, bool saveOnDisposed)
