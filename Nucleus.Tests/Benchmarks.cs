@@ -114,7 +114,7 @@ namespace Nucleus.Tests
                 Console.WriteLine("Nucleus' file weights {0} KBs.", Math.Round((double)(fs.Length / 1024), 2));
             }
 
-            using (FileStream fs = new FileStream(@"D:\Raven\DATA", FileMode.Open, FileAccess.Read))
+            using (FileStream fs = new FileStream(@"D:\Raven\Data", FileMode.Open, FileAccess.Read))
             {
                 Console.WriteLine("RavenDB' file weights {0} KBs.", Math.Round((double)(fs.Length / 1024), 2));
             }

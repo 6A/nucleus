@@ -74,7 +74,7 @@ namespace Nucleus
                 }
             }
         }
-
+        
         public void Add(string key, T value)
         {
             if (keys.Contains(key))
@@ -167,6 +167,7 @@ namespace Nucleus
         }
 
         #region Dynamic
+        /// <remarks>The dynamic object can be disposed</remarks>
         public dynamic AsDynamic()
         {
             return new DynamicQuery<T>(this);
