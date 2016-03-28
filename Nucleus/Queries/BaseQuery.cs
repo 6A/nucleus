@@ -117,7 +117,7 @@ namespace Nucleus
         {
             try
             {
-                byte[] bytes = s.enumerator.core.Serialize<T>(obj);
+                byte[] bytes = s.enumerator.core.PreSerialize<T>(obj);
                 Write(index, bytes);
                 cache[index] = obj;
             }
@@ -204,16 +204,15 @@ namespace Nucleus
         protected T Deserialize(int index, byte[] bytes)
         {
             if (!cache.ContainsKey(index))
-                cache.Add(index, s.enumerator.core.Deserialize<T>(bytes));
+                cache.Add(index, (T)s.enumerator.core.PreDeserialize<T>(bytes));
             return cache[index];
         }
         
         protected object Deserialize(int index, byte[] bytes, Type t)
         {
-            return s.enumerator.core.GetType().GetRuntimeMethods()
-                .First(x => x.Name == "Deserialize")
-                .MakeGenericMethod(new Type[] { t })
-                .Invoke(s.enumerator.core, new object[] { bytes });
+            if (!cache.ContainsKey(index))
+                cache.Add(index, (T)s.enumerator.core.PreDeserialize(bytes, t));
+            return cache[index];
         }
 
         protected void ClearCache()

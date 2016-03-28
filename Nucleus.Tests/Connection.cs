@@ -10,6 +10,7 @@ namespace Nucleus.Tests
 {
     public class Connection : CoreConnection
     {
+        protected override Stream RWStream { get { return fs; } }
         FileStream fs;
 
         protected override T Deserialize<T>(byte[] bytes)
@@ -17,11 +18,6 @@ namespace Nucleus.Tests
             return typeof(T) == typeof(string)
                 ? (T)(object)Encoding.UTF8.GetString(bytes)
                 : JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bytes));
-        }
-
-        protected override Stream GetRWStream()
-        {
-            return fs;
         }
 
         protected override byte[] Serialize<T>(T obj)
