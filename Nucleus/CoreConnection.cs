@@ -238,7 +238,8 @@ namespace Nucleus
         #endregion
 
         /// <summary>
-        /// Empty constructor
+        /// Empty constructor.
+        /// Do not forget to call <see cref="Initialize"/>!
         /// </summary>
         protected CoreConnection()
         {

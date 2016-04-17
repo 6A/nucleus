@@ -64,9 +64,10 @@ namespace Nucleus
             {
                 int index = keys.IndexOf(key) + 1;
 
-                if (index == 0)
+                if (index == 0 && this.TryWrite(keys.Count + 1, value))
                 {
-                    throw new KeyNotFoundException();
+                    keys.Add(key);
+                    this.TryWrite(0, Encoding.UTF8.GetBytes(String.Join(";", keys)));
                 }
                 else
                 {
@@ -77,14 +78,16 @@ namespace Nucleus
         
         public void Add(string key, T value)
         {
-            if (keys.Contains(key))
-            {
-                this[key] = value;
-            }
-            else if (this.TryWrite(keys.Count + 1, value))
+            int index = keys.IndexOf(key) + 1;
+
+            if (index == 0 && this.TryWrite(keys.Count + 1, value))
             {
                 keys.Add(key);
                 this.TryWrite(0, Encoding.UTF8.GetBytes(String.Join(";", keys)));
+            }
+            else
+            {
+                this.TryWrite(index, value);
             }
         }
 

@@ -8,6 +8,7 @@ using System.Reflection;
 using System.IO;
 using Shouldly;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Nucleus.Tests
 {
@@ -23,23 +24,28 @@ namespace Nucleus.Tests
             if (File.Exists(file)) File.Delete(file); // temporary
             isNew = !File.Exists(file);
 
-            using (cx = new Connection(file))
+            cx = new Connection(file);
+            if (isNew)
             {
-                if (isNew)
-                {
-                    PopulateQuery();
-                    PopulateDictionaryQuery();
-                    PopulateDynamicQuery();
-                }
-
-                TestQuery();
-                TestDictionaryQuery();
-                TestDynamicQuery();
-                TestParallelModifications();
+                PopulateQuery();
+                PopulateDictionaryQuery();
+                PopulateDynamicQuery();
             }
 
-            Benchmark();
+            TestQuery();
+            TestDictionaryQuery();
+            TestDynamicQuery();
+            TestParallelModifications();
+
+            new Thread(new ThreadStart(async () =>
+            {
+                await TestMultithreading();
+            })).Start();
+
+            //Benchmark();
+            Console.WriteLine("All tests passed successfully!");
             Console.ReadKey();
+            cx.Dispose();
         }
 
         static void TestQuery()
@@ -98,7 +104,27 @@ namespace Nucleus.Tests
                     pdic["hello"] = "you";
                 }
 
+                dic.ShouldContainKey("hello");
                 dic["hello"].ShouldBe("you");
+                dic.Clear();
+            }
+        }
+
+        static async Task TestMultithreading()
+        {
+            Random rand = new Random();
+
+            using (DictionaryQuery<string> dic = cx.DictionaryQuery<string>("async"))
+            {
+                for (int i = 0; i < 15; i++)
+                {
+                    if (!dic.ContainsKey("nb" + i))
+                    {
+                        await Task.Delay(rand.Next(1000));
+                        dic["nb" + i % 2] = "whatever" + i;
+                    }
+                }
+
                 dic.Clear();
             }
         }
