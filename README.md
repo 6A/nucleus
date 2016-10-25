@@ -77,6 +77,12 @@ You have a query opened from two places at the same time? No problem, queries ar
 ## Informations
 - Data is saved to file everytime `BaseQuery.Save()` is called. By default, this method is called when `Disposed()` is called. This behaviour can be changed by passing `false` to `Connection.*Query(string, bool)` or by changing `BaseQuery.SaveOnDisposed` to `false`.
 
+## Warning
+I spent many hours making, improving, and optimizing Nucleus. However, this project is rather old, and may have some rare bugs.  
+You're welcome to make sure it works for you.
+
+Right now, it DOES pass many tests easily, and quickly.
+
 ## How does it work?
 What follows is technical. You do not need to know how Nucleus works to use it.
 
