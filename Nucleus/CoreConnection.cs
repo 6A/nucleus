@@ -314,9 +314,37 @@ namespace Nucleus
             return new DictionaryQuery<T>(Enumerator.OfNameAndType(name, SectorType.Generic | SectorType.Dictionary), saveOnDisposed);
         }
 
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Enumerator.Dispose();
+
+                    if (RWStream != null)
+                    {
+                        try
+                        {
+                            RWStream.Dispose();
+                        }
+                        catch (Exception) {}
+                    }
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
-            Enumerator.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+        #endregion
     }
 }

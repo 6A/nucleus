@@ -8,16 +8,13 @@ First, you have to create a ``Connection`` that extends ``BaseConnection``.
 ```csharp
 public class Connection : CoreConnection
 {
-    FileStream fs;
+    private FileStream fs;
+    
+    protected override Stream RWStream { get { return fs; } }
 
     protected override T Deserialize<T>(byte[] bytes)
     {
         throw new NotImplementedException();
-    }
-
-    protected override Stream GetRWStream()
-    {
-        return fs;
     }
 
     protected override byte[] Serialize<T>(T obj)

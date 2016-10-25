@@ -31,7 +31,7 @@ namespace Nucleus
                 }
                 else
                 {
-                    throw new IOException();
+                    throw new Exception("");
                 }
             }
 

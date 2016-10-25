@@ -127,12 +127,8 @@ namespace Nucleus
                 }
             }
         }
-        
-        public void Dispose()
-        {
-            cache.Clear();
-            io.Dispose();
-        }
+
+
 
         public override string ToString()
         {
@@ -145,6 +141,11 @@ namespace Nucleus
                 sb.Append(Encoding.UTF8.GetString(bytes, 0, read));
             io.Seek(originalPos, SeekOrigin.Begin);
             return sb.ToString();
+        }
+
+        public void Dispose()
+        {
+            cache = null;
         }
     }
 }

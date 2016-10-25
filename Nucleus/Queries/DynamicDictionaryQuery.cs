@@ -165,8 +165,8 @@ namespace Nucleus
             {
                 if (TryRemove(index))
                 {
-                    types.RemoveAt(index);
-                    keys.RemoveAt(index);
+                    types.RemoveAt(index - 2);
+                    keys.RemoveAt(index - 2);
                 }
             }
         }

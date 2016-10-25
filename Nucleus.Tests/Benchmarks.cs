@@ -86,14 +86,14 @@ namespace Nucleus.Tests
             ravendbWrite = sw.ElapsedMilliseconds;
 
             sw.Restart();
-            List<User> nusers = nquery.Take(256).ToList();
+            List<User> nusers = nquery.Take(512).ToList();
             nquery.Dispose();
             nucleus.Dispose();
             sw.Stop();
             nucleusRead = sw.ElapsedMilliseconds;
 
             sw.Restart();
-            List<User> rusers = rquery.Query<User>().Take(256).ToList();
+            List<User> rusers = rquery.Query<User>().Take(512).ToList();
             rquery.Dispose();
             DataDocumentStore.Instance.Dispose();
             sw.Stop();

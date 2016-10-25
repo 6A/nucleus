@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Raven.Imports.Newtonsoft.Json;
+using Raven.Imports.Newtonsoft.Json.Bson;
 
 namespace Nucleus.Tests
 {
@@ -15,16 +16,24 @@ namespace Nucleus.Tests
 
         protected override T Deserialize<T>(byte[] bytes)
         {
-            return typeof(T) == typeof(string)
-                ? (T)(object)Encoding.UTF8.GetString(bytes)
-                : JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bytes));
+            using (MemoryStream ms = new MemoryStream(bytes))
+            using (BsonReader reader = new BsonReader(ms))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                return serializer.Deserialize<T>(reader);
+            }
         }
 
         protected override byte[] Serialize<T>(T obj)
         {
-            return typeof(T) == typeof(string)
-                ? Encoding.UTF8.GetBytes((string)(object)obj)
-                : Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj));
+            using (MemoryStream ms = new MemoryStream())
+            using (BsonWriter writer = new BsonWriter(ms))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(writer, obj);
+
+                return ms.ToArray();
+            }
         }
 
         public Connection(string url)

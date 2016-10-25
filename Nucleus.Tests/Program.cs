@@ -42,7 +42,7 @@ namespace Nucleus.Tests
                 await TestMultithreading();
             })).Start();
 
-            //Benchmark();
+            Benchmark();
             Console.WriteLine("All tests passed successfully!");
             Console.ReadKey();
             cx.Dispose();

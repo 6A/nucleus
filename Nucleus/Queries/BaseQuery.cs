@@ -12,6 +12,7 @@ namespace Nucleus
     public abstract class BaseQuery<T> : IDisposable
     {
         private const int BLOCK_SIZE = 4096;
+        private const int CACHE_SIZE = 256;
 
         internal Sector s;
         internal Dictionary<int, T> cache;
@@ -119,7 +120,10 @@ namespace Nucleus
             {
                 byte[] bytes = s.enumerator.core.PreSerialize<T>(obj);
                 Write(index, bytes);
+
                 cache[index] = obj;
+                if (cache.Count > CACHE_SIZE)
+                    cache.Remove(cache.First().Key);
             }
             catch (Exception)
             {

@@ -48,7 +48,7 @@ namespace Nucleus
 
                 if (index == 0)
                 {
-                    throw new IndexOutOfRangeException();
+                    throw new IndexOutOfRangeException("The given key '" + key + "' could not be found.");
                 }
                 else if (this.TryRead(index, out bytes))
                 {
@@ -56,7 +56,7 @@ namespace Nucleus
                 }
                 else
                 {
-                    throw new IOException();
+                    throw new IOException("Error while reading key '" + key + "'.");
                 }
             }
 
@@ -176,11 +176,11 @@ namespace Nucleus
             return new DynamicQuery<T>(this);
         }
 
-        public class DynamicQuery<T> : DynamicObject, IDisposable
+        public class DynamicQuery<TDyn> : DynamicObject, IDisposable
         {
-            private DictionaryQuery<T> query;
+            private DictionaryQuery<TDyn> query;
 
-            public DynamicQuery(DictionaryQuery<T> dic)
+            public DynamicQuery(DictionaryQuery<TDyn> dic)
             {
                 query = dic;
             }
@@ -240,9 +240,9 @@ namespace Nucleus
             {
                 string s = keyIn(indexes);
 
-                if (s != null && value is T)
+                if (s != null && value is TDyn)
                 {
-                    query[s] = (T)value;
+                    query[s] = (TDyn)value;
                     return true;
                 }
                 else
@@ -253,9 +253,9 @@ namespace Nucleus
 
             public override bool TrySetMember(SetMemberBinder binder, object value)
             {
-                if (value is T)
+                if (value is TDyn)
                 {
-                    query[binder.Name] = (T)value;
+                    query[binder.Name] = (TDyn)value;
                     return true;
                 }
                 else
